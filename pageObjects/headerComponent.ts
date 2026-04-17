@@ -6,6 +6,10 @@ export class HeaderComponent {
         this.page = page
     }
 
+    get bagCounter(): Locator {
+        return this.page.locator('span.hnf-header__cart-counter');
+    }
+
     get searchBox(): Locator {
         return this.page.locator('#ikea-search-input');
     }
