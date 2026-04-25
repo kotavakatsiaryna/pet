@@ -15,6 +15,6 @@ export class HeaderComponent {
     }
 
     get searchPredictiveDropdown(): Locator {
-        return this.page.getByRole('dialog', { name: 'Search suggestions' });
+        return this.page.locator('#search-suggestions');
     }
 }

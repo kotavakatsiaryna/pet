@@ -56,6 +56,18 @@ export class PdpPage {
         await this.page.goto(`/de/en/p/${productCode}`);
     }
 
+    get addedToWishlistToast(): Locator {
+        return this.page.locator('div[role=alertdialog]')
+    }
+
+    get addToFavouritesButton(): Locator {
+        return this.page.getByLabel('Save to shopping list');
+    }
+
+    async waitForRemoveFromFavouritesButton(): Promise<void> {
+        await this.page.waitForSelector('[aria-label="Remove from shopping list"]:visible');
+    }
+
     async selectDifferentColourOption(): Promise<string> {
         const randomIndex = _.random(0, await this.listOfAvailableAdditionalColours.count() - 1)
         const pickedColour = await this.listOfAvailableAdditionalColours.nth(randomIndex).getAttribute('aria-label');

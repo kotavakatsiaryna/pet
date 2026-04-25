@@ -5,6 +5,7 @@ import { ProductListPage } from './productListPage';
 import { HeaderComponent } from './headerComponent';
 import { SearchResultsPage } from './searchResultsPage';
 import {expect} from '@playwright/test';
+import {FavouritesPage} from "./favouritesPage";
 
 export class App {
     private page: Page;
@@ -13,6 +14,7 @@ export class App {
     productListPage: ProductListPage;
     headerBar: HeaderComponent;
     searchResultsPage: SearchResultsPage;
+    favouritesPage: FavouritesPage;
 
     constructor(page: Page) {
         this.page = page;
@@ -21,6 +23,7 @@ export class App {
         this.productListPage = new ProductListPage(page);
         this.headerBar = new HeaderComponent(page);
         this.searchResultsPage = new SearchResultsPage(page);
+        this.favouritesPage = new FavouritesPage(page);
     }
 
     async acceptCookies(): Promise<void> {
