@@ -1,29 +1,10 @@
-import { test, expect, Page} from '@playwright/test';
-import {App} from '../pageObjects/baseApp';
+import { test, expect } from '../pageObjects/fixtures';
 import {products} from '../fixtures/products';
 import {categories} from '../fixtures/categories';
 import _ = require('lodash');
 
 test.describe('test scenarios to verify bag functionality', async () => {
-  let app: App, page: Page;
-  test.beforeEach(
-    'set up DE location and accept cookies',
-    async ({ browser }) => {
-      const context = await browser.newContext();
-      await context.addCookies([
-        {
-          name: 'ikea_geo',
-          value: 'DE',
-          url: 'https://ikea.com',
-        },
-      ]);
-      page = await context.newPage();
-      await page.goto('');
-      app = new App(page);
-      await app.acceptCookies();
-    }
-  );
-  test('verify user is able to add any item to the bag being on PDP', async () => {
+  test('verify user is able to add any item to the bag being on PDP', async ({ app }) => {
     const targetProduct = _.sample(products.noSizeNoColour);
     await app.productDetailsPage.navigateToProductPage(targetProduct.sku);
     await app.productDetailsPage.addToBagButton.click();
@@ -36,7 +17,7 @@ test.describe('test scenarios to verify bag functionality', async () => {
       await app.bagPage.getAddedItem(targetProduct.title)
     ).toBeVisible();
   });
-  test('verify user is able to add any item to the bag being on PLP', async () => {
+  test('verify user is able to add any item to the bag being on PLP', async ({ app }) => {
     await app.productListPage.navigateToCategory(_.sample(categories));
     await app.productListPage.addToCartButton.click();
     await expect(app.productListPage.addedToBagToast).toBeVisible();
@@ -47,7 +28,7 @@ test.describe('test scenarios to verify bag functionality', async () => {
     await app.bagPage.navigateToBagPage();
     expect(await app.bagPage.listOfAddedProducts.count()).toEqual(1);
   });
-  test('verify user is able to increase product amount in the bag', async () => {
+  test('verify user is able to increase product amount in the bag', async ({ app, page }) => {
     const targetProduct = _.sample(products.noSizeNoColour);
     await app.productDetailsPage.navigateToProductPage(targetProduct.sku);
     await app.productDetailsPage.addToBagButton.click();
@@ -61,7 +42,7 @@ test.describe('test scenarios to verify bag functionality', async () => {
     const finalBagSum = await app.bagPage.getBagTotalSum();
     expect(finalBagSum).toEqual(startBagSum * 2);
   });
-  test('verify user is able to decrease product amount in the bag', async () => {
+  test('verify user is able to decrease product amount in the bag', async ({ app, page }) => {
     const targetProduct = _.sample(products.noSizeNoColour);
     await app.productDetailsPage.navigateToProductPage(targetProduct.sku);
     await app.productDetailsPage.addToBagButton.click();
@@ -78,7 +59,7 @@ test.describe('test scenarios to verify bag functionality', async () => {
     const finalBagSum = await app.bagPage.getBagTotalSum();
     expect(finalBagSum).toEqual(startBagSum / 2);
   });
-  test('verify user is able to remove product from the bag', async () => {
+  test('verify user is able to remove product from the bag', async ({ app }) => {
     const targetProduct = _.sample(products.noSizeNoColour);
     await app.productDetailsPage.navigateToProductPage(targetProduct.sku);
     await app.productDetailsPage.addToBagButton.click();
@@ -92,7 +73,7 @@ test.describe('test scenarios to verify bag functionality', async () => {
     await expect(app.headerBar.bagCounter).not.toBeVisible();
     await expect(app.bagPage.emptyBagHeader).toBeVisible();
   });
-  test('verify user is able to add several different products to the bag', async () => {
+  test('verify user is able to add several different products to the bag', async ({ app }) => {
     const targetProduct1 = products.noSizeNoColour[0];
     const targetProduct2 = products.noSizeNoColour[1];
     await app.productDetailsPage.navigateToProductPage(targetProduct1.sku);
@@ -110,7 +91,7 @@ test.describe('test scenarios to verify bag functionality', async () => {
       await app.bagPage.getAddedItem(targetProduct2.title)
     ).toBeVisible();
   });
-  test('verify user can go to PDP from bag', async () => {
+  test('verify user can go to PDP from bag', async ({ app, page }) => {
     const targetProduct = _.sample(products.noSizeNoColour);
     await app.productDetailsPage.navigateToProductPage(targetProduct.sku);
     await app.productDetailsPage.addToBagButton.click();

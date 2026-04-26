@@ -1,28 +1,9 @@
-import { test, expect } from '@playwright/test';
-import { App } from '../pageObjects/baseApp';
+import { test, expect } from '../pageObjects/fixtures';
 import { products } from '../fixtures/products';
 import _ = require('lodash');
 
 test.describe('test scenarios to verify PDP functionality', async () => {
-  let app, page;
-  test.beforeEach(
-    'set up PL location and accept cookies',
-    async ({ browser }) => {
-      const context = await browser.newContext();
-      await context.addCookies([
-        {
-          name: 'ikea_geo',
-          value: 'DE',
-          url: 'https://ikea.com',
-        },
-      ]);
-      page = await context.newPage();
-      await page.goto('');
-      app = new App(page);
-      await app.acceptCookies();
-    }
-  );
-  test('verify user is able to switch between different product colours', async () => {
+  test('verify user is able to switch between different product colours', async ({ app, page }) => {
     const targetProduct = _.sample(products.withColour);
     await app.productDetailsPage.navigateToProductPage(targetProduct.sku);
     const newColour =
@@ -36,7 +17,7 @@ test.describe('test scenarios to verify PDP functionality', async () => {
     await app.bagPage.navigateToBagPage();
     await expect(page.getByText(newColour).first()).toBeVisible();
   });
-  test('verify user is able to switch between different product sizes', async () => {
+  test('verify user is able to switch between different product sizes', async ({ app, page }) => {
     const targetProduct = _.sample(products.withSize);
     await app.productDetailsPage.navigateToProductPage(targetProduct.sku);
     await app.productDetailsPage.selectSizeButton.click();
@@ -48,7 +29,7 @@ test.describe('test scenarios to verify PDP functionality', async () => {
     await app.bagPage.navigateToBagPage();
     await expect(page.getByText(newSize).first()).toBeVisible();
   });
-  test('verify user is able to view product information', async () => {
+  test('verify user is able to view product information', async ({ app }) => {
     const targetProduct = _.sample(products.noSizeNoColour);
     await app.productDetailsPage.navigateToProductPage(targetProduct.sku);
     await app.productDetailsPage.productDetailsSection.click();
