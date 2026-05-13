@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS Demo</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        .card { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; }
+        #menu { display: flex; gap: 10px; flex-wrap: wrap; }
+        .output { background: #2c3e50; color: white; padding: 10px; margin-top: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; }
+        .nested { padding: 20px; margin: 10px; border: 2px solid #3498db; cursor: pointer; }
+        .inner { border-color: #e74c3c; margin-left: 40px; }
+    </style>
+</head>
+<body>
+    <h1>📚 JS Demo </h1>
+    <p>Open Console to see all test outputs ↓</p>
+
+    <div class="card">
+        <h2>1️⃣ Event Delegation</h2>
+        <div id="menu">
+            <button data-action="save">💾 Save</button>
+            <button data-action="load">📂 Load</button>
+            <button data-action="delete">🗑 Delete</button>
+        </div>
+        <button id="addBtn">➕ Add New Button</button>
+        <div id="delegation-output" class="output">Click buttons → actions appear here</div>
+    </div>
+
+    <div class="card">
+        <h2>2️⃣ Event Bubbling & stopPropagation</h2>
+        <div id="outer" class="nested">
+            Outer Div
+            <div id="inner" class="nested inner">
+                Inner Div (click me)
+            </div>
+        </div>
+        <div id="bubbling-output" class="output">Click inner div → see bubbling order</div>
+    </div>
+
+    <div class="card">
+        <h2>3️⃣ Async / Await</h2>
+        <button id="fetchBtn">📡 Fetch User Data</button>
+        <div id="user-container" class="output">Click fetch to load user</div>
+    </div>
+
+    <script>
+        // ========== ALL CODE IN ONE FILE ==========
+        
+        // ---------- Closures ----------
+        function createCounter(initial = 0) {
+            let count = initial;
+            return {
+                increment: () => ++count,
+                decrement: () => --count,
+                getValue: () => count,
+            };
+        }
+
+        // ---------- Stack ----------
+        class Stack {
+            #items = [];
+            push(element) { this.#items.push(element); return this; }
+            pop() { if (this.isEmpty()) throw new Error('Empty'); return this.#items.pop(); }
+            peek() { return this.#items[this.#items.length - 1]; }
+            isEmpty() { return this.#items.length === 0; }
+            size() { return this.#items.length; }
+        }
+
+        // ---------- LinkedList ----------
+        class ListNode {
+            constructor(value) { this.value = value; this.next = null; }
+        }
+        class LinkedList {
+            constructor() { this.head = null; this.tail = null; this.length = 0; }
+            append(value) {
+                const node = new ListNode(value);
+                if (!this.head) { this.head = node; this.tail = node; }
+                else { this.tail.next = node; this.tail = node; }
+                this.length++; return this;
+            }
+            prepend(value) {
+                const node = new ListNode(value);
+                if (!this.head) { this.head = node; this.tail = node; }
+                else { node.next = this.head; this.head = node; }
+                this.length++; return this;
+            }
+            toArray() {
+                const result = [];
+                let current = this.head;
+                while (current) { result.push(current.value); current = current.next; }
+                return result;
+            }
+        }
+
+        // ---------- Encapsulation ----------
+        class BankAccount {
+            #balance = 0;
+            #history = [];
+            constructor(owner, initialDeposit) {
+                this.owner = owner;
+                this.#balance = initialDeposit;
+                this.#addToHistory(`Initial: ${initialDeposit}`);
+            }
+            get balance() { return this.#balance; }
+            set balance(amount) {
+                if (amount < 0) throw new Error('Balance cannot be negative');
+                this.#balance = amount;
+                this.#addToHistory(`Set to: ${amount}`);
+            }
+            #addToHistory(entry) { this.#history.push({ entry, date: new Date() }); }
+            getHistory() { return [...this.#history]; }
+        }
+
+        // ---------- Prototypes ----------
+        function Animal(name) { this.name = name; }
+        Animal.prototype.eat = function() { console.log(`${this.name} is eating`); };
+        
+        function Dog(name, breed) { Animal.call(this, name); this.breed = breed; }
+        Dog.prototype = Object.create(Animal.prototype);
+        Dog.prototype.constructor = Dog;
+        Dog.prototype.bark = function() { console.log(`${this.name} says Woof!`); };
+
+        // ---------- Promises ----------
+        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        async function fetchUserData(userId) {
+            await delay(500);
+            if (userId <= 0) throw new Error('Invalid user ID');
+            return { id: userId, name: `User${userId}`, role: 'member' };
+        }
+
+        // ========== CONSOLE TESTS ==========
+        console.log('\n=== Console Tests ===');
+        
+        const counter = createCounter(5);
+        console.log('Closures - counter:', counter.increment(), counter.getValue());
+        
+        const stack = new Stack();
+        stack.push(1).push(2).push(3);
+        console.log('Stack - pop:', stack.pop(), 'peek:', stack.peek());
+        
+        const list = new LinkedList();
+        list.append('a').append('b').prepend('start');
+        console.log('LinkedList:', list.toArray());
+        
+        const account = new BankAccount('John', 1000);
+        account.balance = 500;
+        console.log('Encapsulation - balance:', account.balance);
+        
+        const dog = new Dog('Rex', 'Labrador');
+        dog.eat();
+        dog.bark();
+        
+        console.log('✅ All features loaded!\n');
+
+        // ========== DOM Event Delegation ==========
+        const menu = document.getElementById('menu');
+        const delegationOutput = document.getElementById('delegation-output');
+        
+        if (menu) {
+            menu.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (btn) {
+                    const action = btn.getAttribute('data-action');
+                    delegationOutput.innerHTML = `<p>✅ Clicked: ${action} at ${new Date().toLocaleTimeString()}</p>${delegationOutput.innerHTML}`;
+                    console.log(`🎯 Delegation: ${action} clicked`);
+                    if (action === 'delete') {
+                        console.log('⛔ Stopping propagation!');
+                        e.stopPropagation();
+                    }
+                }
+            });
+        }
+        
+        document.getElementById('addBtn')?.addEventListener('click', () => {
+            const btn = document.createElement('button');
+            btn.setAttribute('data-action', 'dynamic');
+            btn.textContent = '✨ Dynamic Button';
+            menu?.appendChild(btn);
+            delegationOutput.innerHTML = `<p>➕ Dynamic button added</p>${delegationOutput.innerHTML}`;
+            console.log('➕ Dynamic button added');
+        });
+
+        // ========== Event Bubbling ==========
+        const bubblingOutput = document.getElementById('bubbling-output');
+        const outer = document.getElementById('outer');
+        const inner = document.getElementById('inner');
+        
+        outer?.addEventListener('click', () => {
+            bubblingOutput.innerHTML = `<p>🔵 Outer clicked</p>${bubblingOutput.innerHTML}`;
+            console.log('🔵 Outer clicked');
+        });
+        
+        inner?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            bubblingOutput.innerHTML = `<p style="color: #e74c3c">🔴 Inner clicked - STOPPED!</p>${bubblingOutput.innerHTML}`;
+            console.log('🔴 Inner clicked - propagation stopped');
+        });
+
+        // ========== Async Fetch ==========
+        document.getElementById('fetchBtn')?.addEventListener('click', async () => {
+            const container = document.getElementById('user-container');
+            container.innerHTML = '<div>Loading...</div>';
+            try {
+                const user = await fetchUserData(42);
+                container.innerHTML = `<div style="color: #2ecc71">✅ ${user.name} (${user.role}) loaded!</div>`;
+                console.log('✅ User loaded:', user);
+            } catch (err) {
+                container.innerHTML = `<div style="color: #e74c3c">❌ Error: ${err.message}</div>`;
+                console.error('❌ Error:', err);
+            }
+        });
+    </script>
+</body>
+</html>
