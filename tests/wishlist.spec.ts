@@ -1,6 +1,6 @@
 import { test, expect } from '../pageObjects/fixtures';
 import { products } from '../fixtures/products';
-import _ = require('lodash');
+import _ from 'lodash';
 
 test.describe('test scenarios to verify wishlist functionality', async () => {
   let targetProduct: { sku: string; title: string };

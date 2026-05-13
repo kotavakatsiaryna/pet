@@ -1,7 +1,7 @@
 import { test, expect } from '../pageObjects/fixtures';
 import {products} from '../fixtures/products';
 import {categories} from '../fixtures/categories';
-import _ = require('lodash');
+import _ from 'lodash';
 
 test.describe('test scenarios to verify bag functionality', async () => {
   test('verify user is able to add any item to the bag being on PDP', async ({ app }) => {

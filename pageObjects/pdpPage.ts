@@ -1,5 +1,5 @@
 import { Locator, Page } from '@playwright/test';
-import _ = require('lodash');
+import _ from 'lodash';
 
 export class PdpPage {
     private page: Page;

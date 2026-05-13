@@ -1,6 +1,6 @@
 import { test, expect } from '../pageObjects/fixtures';
 import { products } from '../fixtures/products';
-import _ = require('lodash');
+import _ from 'lodash';
 
 test.describe('test scenarios to verify PDP functionality', async () => {
   test('verify user is able to switch between different product colours', async ({ app, page }) => {
